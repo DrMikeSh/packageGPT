@@ -8,7 +8,7 @@ import logging
 from openai import OpenAI
 from pinecone import Pinecone
 
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+OPENAI_API_KEY = os.getenv('OPENAI_KEY')
 PICONE_API_KEY = os.getenv('PICONE_API_KEY')
 
 app = Flask(__name__)
