@@ -51,8 +51,7 @@ def get_results():
         return jsonify({'error': 'Text must be a non-empty string'}), 400
 
     try:
-        os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
-        client = OpenAI()
+        client = OpenAI(api_key = OPENAI_API_KEY)
         # Call OpenAI API with timeout
         text = text.replace("\n", " ")
         openai_response = client.embeddings.create(input=[text], model="text-embedding-3-large", dimensions=1024).data[0].embedding
