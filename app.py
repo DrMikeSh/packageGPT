@@ -40,7 +40,7 @@ def require_auth(f):
 @limiter.limit("20 per minute")  # Rate limit for this endpoint
 def get_results():
     OPENAI_API_KEY = os.getenv('OPENAI_KEY')
-    PICONE_API_KEY = os.getenv('PICONE_API_KEY')
+    PICONE_API_KEY = os.getenv('PINECONE_KEY')
     data = request.json
     if not data or 'text' not in data:
         return jsonify({'error': 'Invalid input'}), 400
