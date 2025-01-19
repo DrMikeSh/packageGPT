@@ -85,5 +85,23 @@ def get_results():
 
     return jsonify({'all_pages': all_pages})
 
+# Privacy Policy Route
+@app.route('/privacy_policy', methods=['GET'])
+def privacy_policy():
+    privacy_text = """
+    Privacy Policy:
+
+    Your privacy is important to us. This application collects and processes data
+    in accordance with applicable data protection laws. The information we collect
+    includes text inputs you provide to our APIs and may be used for improving our services.
+
+    We do not sell, share, or misuse your data. For any concerns or inquiries
+    about your privacy, please contact our support team.
+
+    By using this GPT, you agree to this Privacy Policy.
+    """
+    return jsonify({'privacy_policy': privacy_text})
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=1000)
