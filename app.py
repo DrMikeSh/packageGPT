@@ -8,8 +8,7 @@ import logging
 from openai import OpenAI
 from pinecone import Pinecone
 
-OPENAI_API_KEY = os.getenv('OPENAI_KEY')
-PICONE_API_KEY = os.getenv('PICONE_API_KEY')
+
 
 app = Flask(__name__)
 
@@ -40,6 +39,8 @@ def require_auth(f):
 @require_auth
 @limiter.limit("20 per minute")  # Rate limit for this endpoint
 def get_results():
+    OPENAI_API_KEY = os.getenv('OPENAI_KEY')
+    PICONE_API_KEY = os.getenv('PICONE_API_KEY')
     data = request.json
     if not data or 'text' not in data:
         return jsonify({'error': 'Invalid input'}), 400
@@ -59,7 +60,7 @@ def get_results():
         return jsonify({'error': f'Error calling OpenAI API: {str(e)}'}), 500
     
     try:
-        logging.info(f"vector:{openai_response}")
+        logging.info(f'pinecone key:{PICONE_API_KEY}')
         # Call Picone API with timeout
         pc = Pinecone(api_key=PICONE_API_KEY)
         index = pc.Index("packagegpt")
