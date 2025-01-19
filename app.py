@@ -59,6 +59,7 @@ def get_results():
         return jsonify({'error': f'Error calling OpenAI API: {str(e)}'}), 500
     
     try:
+        logging.info(f"vector:{openai_response}")
         # Call Picone API with timeout
         pc = Pinecone(api_key=PICONE_API_KEY)
         index = pc.Index("packagegpt")
