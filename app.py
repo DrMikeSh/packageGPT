@@ -72,7 +72,7 @@ def get_results():
         picone_response = index.query(
             vector=openai_response,
             include_metadata = True,
-            top_k=10
+            top_k=3
         )     
 
         # Check if the response is valid
@@ -149,77 +149,14 @@ def get_planned_results():
         logging.error(f"OpenAI API call failed for planning: {e}")
         return jsonify({'error': f'Error calling OpenAI API for planning'}), 500
     
-    #Step 2: extract all relevant parts of the solution
-    try:
-        class Parts(BaseModel):
-            a: list[str]
-
-        response = client.beta.chat.completions.parse(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", 
-                "content": '''
-                You are tasked with analyzing instructions for writing code. 
-                Your goal is to extract the five most important topics or key areas to research before writing the requested code.
-                Return the topics as a list of five strings for example:  ['text box', 'radio button', 'caching', 'pages', 'navigation']
-                '''
-                },
-                {"role": "user", "content":str(output_plan)}
-            ],
-            response_format=Parts,
-        )
-
-        output_topics = response.choices[0].message.parsed.a
-        
-    except Exception as e:
-        logging.error(f"OpenAI API call failed for planning: {e}")
-        return jsonify({'error': f'Error calling OpenAI API for extracting topics'}), 500
-
+    
     #Add the plan steps to the output
     final_output = 'Plan:\n'
     for step in output_plan: 
         final_output += f'Step: {step}\n'
-    final_output +='Relevant documentation: \n'
 
-    #Get the relevant documentations
-    for part in output_topics:
-        try:
-            # Call OpenAI API with timeout
-            text = text.replace("\n", " ")
-            openai_response = client.embeddings.create(input=[text], model="text-embedding-3-large", dimensions=1024).data[0].embedding
-        except Exception as e:
-            logging.error(f"OpenAI API call failed: {e}")
-            return jsonify({'error': f'Error calling OpenAI API'}), 500
-    
-        try:
-            # Call Picone API with timeout
-            pc = Pinecone(api_key=PICONE_API_KEY)
-            index = pc.Index("packagegpt")
-            picone_response = index.query(
-                vector=openai_response,
-                include_metadata = True,
-                top_k=2
-            )     
 
-            # Check if the response is valid
-            if not picone_response:
-                raise ValueError("Empty response from Picone API")
-
-        except Exception as e:
-            logging.error(f"Picone API call failed: {e}")
-            return jsonify({'error': 'Error calling Picone API'}), 500
-
-        results = picone_response.matches
-        all_pages = ''
-        for res in results:
-            all_pages += res.metadata['page']
-        
-        # Add then documentations for each topic
-        final_output += part+'\n'
-        final_output += all_pages+'\n'
-
-    logging.info(f"Length of output: {len(final_output)}")
-    return jsonify({'all_pages': final_output[:99000]})
+    return jsonify({'Plan': final_output})
 
 
 ######################### Privacy Policy Route ########################
