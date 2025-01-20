@@ -177,7 +177,7 @@ def get_planned_results():
 
     #Add the plan steps to the output
     final_output = 'Plan:\n'
-    for step in plan: 
+    for step in output_plan: 
         final_output += f'Step: {step}\n'
     final_output +='Relevant documentation: \n'
 
