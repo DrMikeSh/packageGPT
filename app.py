@@ -145,7 +145,7 @@ def get_planned_results():
         )
 
         output_plan = response.choices[0].message.parsed.a
-    except:
+    except Exception as e:
         logging.error(f"OpenAI API call failed for planning: {e}")
         return jsonify({'error': f'Error calling OpenAI API for planning'}), 500
     
@@ -170,7 +170,7 @@ def get_planned_results():
         )
 
         output_topics = response.choices[0].message.parsed.a
-    except:
+    except Exception as e:
         logging.error(f"OpenAI API call failed for planning: {e}")
         return jsonify({'error': f'Error calling OpenAI API for extracting topics'}), 500
 
