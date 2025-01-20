@@ -72,7 +72,7 @@ def get_results():
         picone_response = index.query(
             vector=openai_response,
             include_metadata = True,
-            top_k=3
+            top_k=5
         )     
 
         # Check if the response is valid
