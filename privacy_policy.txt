@@ -1,0 +1,10 @@
+Privacy Policy:
+
+Your privacy is important to us. This application collects and processes data
+in accordance with applicable data protection laws. The information we collect
+includes text inputs you provide to our APIs and may be used for improving our services.
+
+We do not sell, share, or misuse your data. For any concerns or inquiries
+about your privacy, please contact our support team.
+
+By using this GPT, you agree to this Privacy Policy.
