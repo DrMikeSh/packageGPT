@@ -219,7 +219,7 @@ def get_planned_results():
         final_output += all_pages+'\n'
 
     logging.info(f"Length of output: {len(final_output)}")
-    return jsonify({'all_pages': final_output})
+    return jsonify({'all_pages': final_output[:99000})
 
 
 ######################### Privacy Policy Route ########################
