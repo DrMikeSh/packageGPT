@@ -161,7 +161,7 @@ def get_planned_results():
                 "content": '''
                 You are tasked with analyzing instructions for writing code. 
                 Your goal is to extract the five most important topics or key areas to research before writing the requested code.
-                Return the topics as a list of ten strings for example:  ['text box', 'radio button', 'caching', 'pages', 'navigation']
+                Return the topics as a list of five strings for example:  ['text box', 'radio button', 'caching', 'pages', 'navigation']
                 '''
                 },
                 {"role": "user", "content":str(output_plan)}
@@ -218,7 +218,7 @@ def get_planned_results():
         final_output += part+'\n'
         final_output += all_pages+'\n'
 
-
+    logging.info(f"Length of output: {len(final_output)}")
     return jsonify({'all_pages': final_output})
 
 
@@ -235,7 +235,7 @@ def privacy_policy():
     except Exception as e:
         logging.error(f"Error reading privacy policy file: {e}")
         return jsonify({'error': 'An error occurred while loading the privacy policy.'}), 500
-
+    
     return jsonify({'privacy_policy': privacy_text})
 
 
