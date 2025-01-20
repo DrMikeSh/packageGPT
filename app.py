@@ -72,7 +72,7 @@ def get_results():
         picone_response = index.query(
             vector=openai_response,
             include_metadata = True,
-            top_k=5
+            top_k=10
         )     
 
         # Check if the response is valid
@@ -160,8 +160,8 @@ def get_planned_results():
                 {"role": "system", 
                 "content": '''
                 You are tasked with analyzing instructions for writing code. 
-                Your goal is to extract the five most important topics or key areas to research before writing the requested code.
-                Return the topics as a list of five strings for example:  ['text box','radio button','caching','pages','navigation']
+                Your goal is to extract the ten most important topics or key areas to research before writing the requested code.
+                Return the topics as a list of ten strings for example:  ['text box', 'radio button', 'caching', 'pages', 'navigation', 'drop-down menu', 'search bar', 'user authentication', 'data validation', 'file upload']
                 '''
                 },
                 {"role": "user", "content":output_plan}
