@@ -160,8 +160,8 @@ def get_planned_results():
                 {"role": "system", 
                 "content": '''
                 You are tasked with analyzing instructions for writing code. 
-                Your goal is to extract the ten most important topics or key areas to research before writing the requested code.
-                Return the topics as a list of ten strings for example:  ['text box', 'radio button', 'caching', 'pages', 'navigation', 'drop-down menu', 'search bar', 'user authentication', 'data validation', 'file upload']
+                Your goal is to extract the five most important topics or key areas to research before writing the requested code.
+                Return the topics as a list of ten strings for example:  ['text box', 'radio button', 'caching', 'pages', 'navigation']
                 '''
                 },
                 {"role": "user", "content":str(output_plan)}
