@@ -164,12 +164,13 @@ def get_planned_results():
                 Return the topics as a list of ten strings for example:  ['text box', 'radio button', 'caching', 'pages', 'navigation', 'drop-down menu', 'search bar', 'user authentication', 'data validation', 'file upload']
                 '''
                 },
-                {"role": "user", "content":output_plan}
+                {"role": "user", "content":str(output_plan)}
             ],
             response_format=Parts,
         )
 
         output_topics = response.choices[0].message.parsed.a
+        
     except Exception as e:
         logging.error(f"OpenAI API call failed for planning: {e}")
         return jsonify({'error': f'Error calling OpenAI API for extracting topics'}), 500
