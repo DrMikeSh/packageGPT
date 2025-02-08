@@ -7,8 +7,8 @@ from flask_limiter.util import get_remote_address
 import logging
 from openai import OpenAI
 from pinecone import Pinecone
-from pydantic import BaseModel
-
+# from pydantic import BaseModel
+from functions import main_topics
 
 ########################Set up the app########################
 
@@ -52,114 +52,57 @@ def get_results():
         return jsonify({'error': 'Invalid input'}), 400
 
     text = data['text']
+    text = text.replace("\n", " ")
     
     # Input validation
     if not isinstance(text, str) or not text.strip():
         return jsonify({'error': 'Text must be a non-empty string'}), 400
 
+    # Connect to OpenAI API
     try:
         client = OpenAI(api_key = OPENAI_API_KEY)
-        # Call OpenAI API with timeout
-        text = text.replace("\n", " ")
-        openai_response = client.embeddings.create(input=[text], model="text-embedding-3-large", dimensions=1024).data[0].embedding
     except Exception as e:
         return jsonify({'error': f'Error calling OpenAI API: {str(e)}'}), 500
-    
-    try:
-        # Call Picone API with timeout
-        pc = Pinecone(api_key=PICONE_API_KEY)
-        index = pc.Index("packagegpt")
-        picone_response = index.query(
-            vector=openai_response,
-            include_metadata = True,
-            top_k=5
-        )     
 
-        # Check if the response is valid
-        if not picone_response:
-            raise ValueError("Empty response from Picone API")
+    #Get topics from gpt
+    topics = main_topics(text, client)
 
-    except Exception as e:
-        logging.error(f"Picone API call failed: {e}")
-        return jsonify({'error': 'Error calling Picone API'}), 500
+    #search topics in pinecone and write to final_output
+    pc = Pinecone(api_key=PICONE_API_KEY)
+    final_output = ''
 
-    results = picone_response.matches
-    all_pages = ''
-    for res in results:
-        all_pages += res.metadata['page']
+    topics_list = topics.split(';')
+    for topic in topics_list[:11]: #limit to 10 topics
+        topic_embedding = client.embeddings.create(input=[text], model="text-embedding-3-large", dimensions=1024).data[0].embedding
+        try:
+            # Call Picone API with timeout
+            index = pc.Index("packagegpt")
+            picone_response = index.query(
+                vector=openai_response,
+                include_metadata = True,
+                top_k=2
+            )
+            results = picone_response.matches
+            final_output += f"Topic: {topic}\n" 
+            for res in results:
+                final_output += res.metadata['text']     
 
-    return jsonify({'all_pages': all_pages})
+            # Check if the response is valid
+            if not picone_response:
+                raise ValueError("Empty response from Picone API")
 
-
-#Planner function  - Gets the whole request, seperates the request into parts, return docs for each part
-@app.route('/api/get_planned_results', methods=['POST'])
-@require_auth
-@limiter.limit("20 per minute")  # Rate limit for this endpoint
-def get_planned_results():
-    OPENAI_API_KEY = os.getenv('OPENAI_KEY')
-    PICONE_API_KEY = os.getenv('PINECONE_KEY')
-    client = OpenAI(api_key = OPENAI_API_KEY)
-
-    data = request.json
-    if not data or 'text' not in data:
-        return jsonify({'error': 'Invalid input'}), 400
-
-    text = data['text']
-    
-    # Input validation
-    if not isinstance(text, str) or not text.strip():
-        return jsonify({'error': 'Text must be a non-empty string'}), 400
-
-
-    #Step 1: seperate the request into parts
-    try:
-        class Instruction_list(BaseModel):
-            a: list[str]
-
-        response = client.beta.chat.completions.parse(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", 
-                "content": '''
-                You will receive a user-provided text describing the desired code outcome. 
-                Your task is to generate a step-by-step plan that outlines how to achieve the specified outcome. 
-
-                Each step in the plan should be expressed as a simple and clear sentence, such as: 
-                - "Create a class to model the data."
-                - "Create a text box next to the text"
-
-                The final output must be a list of simple sentences summarizing the plan.
-
-                Example Input:
-                "I want to build a web-based calculator that can handle basic arithmetic operations like addition, subtraction, multiplication, and division."
-
-                Example Output:
-                ["Create a front-end interface with buttons for numbers and operations.","Design a back-end API to process arithmetic operations.","Write a function to validate user inputs.", "Integrate the front-end and back-end for real-time calculations.","Test the calculator for edge cases like division by zero."
-
-                Make sure the plan covers all major steps to accomplish the desired outcome, expressed in a concise manner.
-                '''
-                },
-                {"role": "user", "content":text}
-            ],
-            response_format=Instruction_list,
-        )
-
-        output_plan = response.choices[0].message.parsed.a
-    except Exception as e:
-        logging.error(f"OpenAI API call failed for planning: {e}")
-        return jsonify({'error': f'Error calling OpenAI API for planning'}), 500
-    
-    
-    #Add the plan steps to the output
-    final_output = 'Plan:\n'
-    for step in output_plan: 
-        final_output += f'Step: {step}\n'
-
-
-    return jsonify({'Plan': final_output})
+        except Exception as e:
+            logging.error(f"Picone API call failed: {e}")
+            return jsonify({'error': 'Error calling Picone API'}), 500
+        
+    return jsonify({'final_output': final_output})
 
 
 ######################### Privacy Policy Route ########################
+
+#OpenAI requires any GPT have a privacy policy to be distributed by a link. 
+#This is a simple privacy policy, for any serious use case, please consult a legal professional.
+
 
 @app.route('/privacy_policy', methods=['GET'])
 def privacy_policy():
