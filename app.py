@@ -72,6 +72,7 @@ def get_results():
     final_output = ''
 
     topics_list = topics.split(';')
+    logging.error(f"Topics list {topics_list}, topics {topics}")
     n_topics = len(topics_list)
     for topic in topics_list[:11]: #limit to 10 topics
         topic_embedding = client.embeddings.create(input=[text], model="text-embedding-3-large", dimensions=1024).data[0].embedding
