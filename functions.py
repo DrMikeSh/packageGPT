@@ -11,7 +11,7 @@ def main_topics(text, client):
             Important: return only the list of modules or topics, Noting else!
             '''
             },
-            {"role": "user", "User request":text}
+            {"role": "user", "content":f"User request:{text}}
         ],
         temperature=0,
     )
