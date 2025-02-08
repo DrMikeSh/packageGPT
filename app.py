@@ -78,7 +78,7 @@ def get_results():
             # Call Picone API with timeout
             index = pc.Index("packagegpt")
             picone_response = index.query(
-                vector=openai_response,
+                vector=topic_embedding,
                 include_metadata = True,
                 top_k=2
             )
