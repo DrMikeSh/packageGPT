@@ -72,6 +72,7 @@ def get_results():
     final_output = ''
 
     topics_list = topics.split(';')
+    n_topics = len(topics_list)
     for topic in topics_list[:11]: #limit to 10 topics
         topic_embedding = client.embeddings.create(input=[text], model="text-embedding-3-large", dimensions=1024).data[0].embedding
         try:
@@ -80,7 +81,7 @@ def get_results():
             picone_response = index.query(
                 vector=topic_embedding,
                 include_metadata = True,
-                top_k=2
+                top_k=min(20//len(n_topics),6)
             )
             results = picone_response.matches
             final_output += f"Topic: {topic}\n" 
