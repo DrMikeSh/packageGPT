@@ -7,6 +7,8 @@ def main_topics(text, client):
             "content": '''
             You will receive a user-provided text describing the desired code.
             Your task is to analyze the request and determine the most relevant programming modules or topics needed to fulfill it.
+            Stick to Streamlit modules only!
+            Dont list general topics only topics specific to the user request. 
             Return a list of up to 10 of the most important modules or topics, separated by semicolons. 
             Important: return only the list of modules or topics, Noting else!
             '''
