@@ -82,7 +82,7 @@ def get_results():
             picone_response = index.query(
                 vector=topic_embedding,
                 include_metadata = True,
-                top_k=min(20//len(n_topics),6)
+                top_k=min(20//n_topics,6)
             )
             results = picone_response.matches
             final_output += f"Topic: {topic}\n" 
